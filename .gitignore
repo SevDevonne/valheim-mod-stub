@@ -1,5 +1,5 @@
 # Local machine paths and mod identity
-#ModConfig.props
+ModConfig.props
 # Output
 *.zip
 *.txt
