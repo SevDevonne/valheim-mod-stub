@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- Mod identity. -->
+    <ModName>ValeriusModStub</ModName>
+    <ModVersion>0.0.1</ModVersion>
+    <ModGuid>ValeriusModStub</ModGuid>
+    <ModDescription>Valerius BepInEx/Harmony mod.</ModDescription>
+    <ModWebsite></ModWebsite>
+    <ModDependencies>denikson-BepInExPack_Valheim-5.4.2351</ModDependencies>
+
+    <!-- Local paths. -->
+    <ValheimPath>D:\SteamLibrary\steamapps\common\Valheim</ValheimPath>
+    <BepInExCorePath>C:\Users\YOUR_NAME\AppData\Roaming\com.kesomannen.gale\valheim\profiles\Default\BepInEx\core</BepInExCorePath>
+    <ModDeployPath>C:\Users\YOUR_NAME\AppData\Roaming\com.kesomannen.gale\valheim\profiles\Default\BepInEx\plugins</ModDeployPath>
+  </PropertyGroup>
+</Project>

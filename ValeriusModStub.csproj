@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)\ModConfig.props" />
+
+  <PropertyGroup>
+    <AssemblyName>$(ModName)</AssemblyName>
+    <Version>$(ModVersion)</Version>
+    <RootNamespace>$(ModName)</RootNamespace>
+    <ValheimManagedPath>$(ValheimPath)\Valheim_Data\Managed</ValheimManagedPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="assembly_valheim">
+      <HintPath>$(ValheimManagedPath)\assembly_valheim.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ValheimManagedPath)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ValheimManagedPath)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCorePath)\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCorePath)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="ValidateModConfig" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(ModName)' == '' Or '$(ModVersion)' == '' Or '$(ModGuid)' == ''"
+           Text="Set ModName, ModVersion, and ModGuid in ModConfig.props." />
+    <Error Condition="'$(ValheimPath)' == '' Or '$(BepInExCorePath)' == ''"
+           Text="Set ValheimPath and BepInExCorePath in ModConfig.props." />
+    <Error Condition="'$(Configuration)' == 'Debug' And '$(ModDeployPath)' == ''"
+           Text="Set ModDeployPath in ModConfig.props to the BepInEx/plugins folder." />
+    <Error Condition="!Exists('$(ValheimManagedPath)\assembly_valheim.dll')"
+           Text="Missing assembly_valheim.dll: $(ValheimManagedPath)" />
+    <Error Condition="!Exists('$(ValheimManagedPath)\UnityEngine.dll')"
+           Text="Missing UnityEngine.dll: $(ValheimManagedPath)" />
+    <Error Condition="!Exists('$(ValheimManagedPath)\UnityEngine.CoreModule.dll')"
+           Text="Missing UnityEngine.CoreModule.dll: $(ValheimManagedPath)" />
+    <Error Condition="!Exists('$(BepInExCorePath)\BepInEx.dll')"
+           Text="Missing BepInEx.dll: $(BepInExCorePath)" />
+    <Error Condition="!Exists('$(BepInExCorePath)\0Harmony.dll')"
+           Text="Missing 0Harmony.dll: $(BepInExCorePath)" />
+  </Target>
+
+  <!-- Compile a generated copy of Plugin.cs so its namespace follows ModName. -->
+  <ItemGroup>
+    <Compile Remove="Plugin.cs" />
+  </ItemGroup>
+
+  <!-- Generate compile-time identity constants from ModConfig.props. -->
+  <Target Name="GenerateModIdentity" BeforeTargets="CoreCompile" DependsOnTargets="ValidateModConfig">
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <Exec Command='powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\publish.ps1&quot; -Action Generate -ProjectPath &quot;$(MSBuildProjectDirectory)&quot; -GeneratedPath &quot;$(MSBuildProjectDirectory)\$(IntermediateOutputPath)ModIdentity.g.cs&quot;' />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)ModIdentity.g.cs" />
+      <Compile Include="$(IntermediateOutputPath)Plugin.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Publish the compiled DLL. Never calls dotnet build recursively. -->
+  <Target Name="PublishMod" AfterTargets="Build"
+          Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Release'">
+    <Exec Command='powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\publish.ps1&quot; -Action &quot;$(Configuration)&quot; -ProjectPath &quot;$(MSBuildProjectDirectory)&quot; -AssemblyPath &quot;$(TargetPath)&quot;' />
+  </Target>
+</Project>

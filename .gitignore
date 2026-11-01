@@ -1,0 +1,16 @@
+# Local machine paths and mod identity
+#ModConfig.props
+# Output
+*.zip
+*.txt
+*.ps1
+
+bin/
+obj/
+
+
+Package/
+Releases/
+# IDE
+.vs/
+*.user
