@@ -3,7 +3,6 @@ ModConfig.props
 # Output
 *.zip
 *.txt
-*.ps1
 
 bin/
 obj/
